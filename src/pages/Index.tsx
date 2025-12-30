@@ -1,13 +1,112 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { motion } from "framer-motion";
+import { MainLayout } from "@/components/layout/MainLayout";
+import { GitHubCard } from "@/components/cards/GitHubCard";
+import { SpotifyCard } from "@/components/cards/SpotifyCard";
+import { CalendarCard } from "@/components/cards/CalendarCard";
+import { DailyBriefCard } from "@/components/cards/DailyBriefCard";
+import { Search, Command } from "lucide-react";
 
 const Index = () => {
+  const currentDate = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+    <MainLayout>
+      {/* Header */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mb-8 flex items-center justify-between"
+      >
+        <div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            className="text-sm text-muted-foreground"
+          >
+            {currentDate}
+          </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="font-display text-3xl font-bold text-foreground"
+          >
+            Good morning, <span className="gradient-text">Developer</span>
+          </motion.h1>
+        </div>
+
+        {/* Search Bar */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3 }}
+          className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-2.5 backdrop-blur-sm"
+        >
+          <Search className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm text-muted-foreground">Search your mind...</span>
+          <div className="ml-8 flex items-center gap-1 rounded-md bg-background/50 px-2 py-1">
+            <Command className="h-3 w-3 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">K</span>
+          </div>
+        </motion.div>
+      </motion.header>
+
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Left Column - Activity Cards */}
+        <div className="space-y-6 lg:col-span-2">
+          <div className="grid gap-6 md:grid-cols-2">
+            <GitHubCard />
+            <SpotifyCard />
+          </div>
+          <CalendarCard />
+        </div>
+
+        {/* Right Column - Daily Brief */}
+        <div className="lg:col-span-1">
+          <DailyBriefCard />
+        </div>
       </div>
-    </div>
+
+      {/* Quick Stats Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6 }}
+        className="mt-8 glass-card p-4"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <div>
+              <p className="text-xs text-muted-foreground">Cognitive Load</p>
+              <div className="flex items-center gap-2">
+                <span className="pulse-indicator calm" />
+                <span className="text-sm font-medium text-foreground">Low</span>
+              </div>
+            </div>
+            <div className="h-8 w-px bg-border" />
+            <div>
+              <p className="text-xs text-muted-foreground">Focus Score</p>
+              <p className="text-sm font-medium text-foreground">87%</p>
+            </div>
+            <div className="h-8 w-px bg-border" />
+            <div>
+              <p className="text-xs text-muted-foreground">Sync Status</p>
+              <p className="text-sm font-medium text-primary">All Local</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+            AI inference running locally
+          </div>
+        </div>
+      </motion.div>
+    </MainLayout>
   );
 };
 
