@@ -1,1 +1,4 @@
 project_id = "jdieilyakhovncenwmsa"
+
+[functions.github-activity]
+verify_jwt = false
