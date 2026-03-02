@@ -9,6 +9,7 @@ interface GitHubCommit {
   message: string;
   time: string;
   sha: string;
+  author?: string;
 }
 
 interface GitHubData {
@@ -17,6 +18,7 @@ interface GitHubData {
   commits: GitHubCommit[];
   todayCommitCount: number;
   activeBranches: number;
+  trackedRepoCount: number;
 }
 
 function formatTime(iso: string) {
@@ -35,11 +37,11 @@ export function GitHubCard() {
       if (error) throw error;
       return data as GitHubData;
     },
-    refetchInterval: 5 * 60 * 1000, // refresh every 5 min
+    refetchInterval: 5 * 60 * 1000,
     staleTime: 2 * 60 * 1000,
   });
 
-  const commits = data?.commits?.slice(0, 3) ?? [];
+  const commits = data?.commits?.slice(0, 5) ?? [];
   const todayCount = data?.todayCommitCount ?? 0;
   const branches = data?.activeBranches ?? 0;
 
@@ -58,13 +60,13 @@ export function GitHubCard() {
           <div>
             <h3 className="font-display font-semibold text-foreground">GitHub</h3>
             <p className="text-xs text-muted-foreground">
-              {isLoading ? "Loading..." : isError ? "Connection error" : "Recent activity"}
+              {isLoading ? "Loading..." : isError ? "Connection error" : data?.username ? `@${data.username}` : "Recent activity"}
             </p>
           </div>
         </div>
-        <button className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-muted">
-          <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-        </button>
+        {data?.avatarUrl && (
+          <img src={data.avatarUrl} alt="" className="h-8 w-8 rounded-full border border-border" />
+        )}
       </div>
 
       <div className="mb-4 flex items-center gap-4">
@@ -81,27 +83,30 @@ export function GitHubCard() {
         </div>
         <div className="flex items-center gap-2">
           <GitBranch className="h-4 w-4 text-secondary" />
-          <span className="text-sm text-muted-foreground">{branches} active branches</span>
+          <span className="text-sm text-muted-foreground">{branches} branches</span>
         </div>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-16 animate-pulse rounded-lg bg-muted/30" />
+            <div key={i} className="h-14 animate-pulse rounded-lg bg-muted/30" />
           ))
         ) : commits.length === 0 ? (
-          <p className="text-sm text-muted-foreground py-4 text-center">No recent commits</p>
+          <p className="text-sm text-muted-foreground py-4 text-center">
+            No recent commits.{" "}
+            {(data?.trackedRepoCount ?? 0) === 0 && "Add repos to track!"}
+          </p>
         ) : (
           commits.map((commit, index) => (
             <motion.div
               key={commit.sha ?? index}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + index * 0.1 }}
+              transition={{ delay: 0.2 + index * 0.08 }}
               className="flex items-start gap-3 rounded-lg bg-muted/30 p-3"
             >
-              <div className="mt-0.5 h-2 w-2 rounded-full bg-primary" />
+              <div className="mt-1.5 h-2 w-2 rounded-full bg-primary" />
               <div className="flex-1 min-w-0">
                 <p className="truncate text-sm font-medium text-foreground">
                   {commit.message}
