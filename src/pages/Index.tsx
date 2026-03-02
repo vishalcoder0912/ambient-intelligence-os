@@ -1,12 +1,15 @@
 import { motion } from "framer-motion";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { GitHubCard } from "@/components/cards/GitHubCard";
+import { RepoManagerCard } from "@/components/cards/RepoManagerCard";
 import { SpotifyCard } from "@/components/cards/SpotifyCard";
 import { CalendarCard } from "@/components/cards/CalendarCard";
 import { DailyBriefCard } from "@/components/cards/DailyBriefCard";
-import { Search, Command } from "lucide-react";
+import { Search, Command, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
+  const { user, signOut } = useAuth();
   const currentDate = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     month: "long",
@@ -36,38 +39,51 @@ const Index = () => {
             transition={{ delay: 0.2 }}
             className="font-display text-3xl font-bold text-foreground"
           >
-            Good morning, <span className="gradient-text">Developer</span>
+            Good morning, <span className="gradient-text">{user?.email?.split("@")[0] || "Developer"}</span>
           </motion.h1>
         </div>
 
-        {/* Search Bar */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-          className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-2.5 backdrop-blur-sm"
-        >
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">Search your mind...</span>
-          <div className="ml-8 flex items-center gap-1 rounded-md bg-background/50 px-2 py-1">
-            <Command className="h-3 w-3 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground">K</span>
-          </div>
-        </motion.div>
+        <div className="flex items-center gap-3">
+          {/* Search Bar */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-2.5 backdrop-blur-sm"
+          >
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Search your mind...</span>
+            <div className="ml-8 flex items-center gap-1 rounded-md bg-background/50 px-2 py-1">
+              <Command className="h-3 w-3 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">K</span>
+            </div>
+          </motion.div>
+
+          <button
+            onClick={signOut}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            title="Sign out"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
+        </div>
       </motion.header>
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Left Column - Activity Cards */}
+        {/* Left Column */}
         <div className="space-y-6 lg:col-span-2">
           <div className="grid gap-6 md:grid-cols-2">
             <GitHubCard />
-            <SpotifyCard />
+            <RepoManagerCard />
           </div>
-          <CalendarCard />
+          <div className="grid gap-6 md:grid-cols-2">
+            <SpotifyCard />
+            <CalendarCard />
+          </div>
         </div>
 
-        {/* Right Column - Daily Brief */}
+        {/* Right Column */}
         <div className="lg:col-span-1">
           <DailyBriefCard />
         </div>
@@ -97,12 +113,12 @@ const Index = () => {
             <div className="h-8 w-px bg-border" />
             <div>
               <p className="text-xs text-muted-foreground">Sync Status</p>
-              <p className="text-sm font-medium text-primary">All Local</p>
+              <p className="text-sm font-medium text-primary">All Synced</p>
             </div>
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-            AI inference running locally
+            Tracking {user?.email?.split("@")[0]}'s repos
           </div>
         </div>
       </motion.div>
