@@ -1,13 +1,48 @@
 import { motion } from "framer-motion";
-import { Github, GitCommit, GitBranch, ArrowUpRight } from "lucide-react";
+import { Github, GitCommit, GitBranch, ArrowUpRight, Loader2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { formatDistanceToNow } from "date-fns";
 
-const mockCommits = [
-  { repo: "second-brain-os", message: "Add semantic search pipeline", time: "2h ago" },
-  { repo: "ml-experiments", message: "Optimize embedding generation", time: "5h ago" },
-  { repo: "second-brain-os", message: "Implement pulse background", time: "1d ago" },
-];
+interface GitHubCommit {
+  repo: string;
+  message: string;
+  time: string;
+  sha: string;
+}
+
+interface GitHubData {
+  username: string;
+  avatarUrl: string;
+  commits: GitHubCommit[];
+  todayCommitCount: number;
+  activeBranches: number;
+}
+
+function formatTime(iso: string) {
+  try {
+    return formatDistanceToNow(new Date(iso), { addSuffix: true });
+  } catch {
+    return iso;
+  }
+}
 
 export function GitHubCard() {
+  const { data, isLoading, isError } = useQuery<GitHubData>({
+    queryKey: ["github-activity"],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke("github-activity");
+      if (error) throw error;
+      return data as GitHubData;
+    },
+    refetchInterval: 5 * 60 * 1000, // refresh every 5 min
+    staleTime: 2 * 60 * 1000,
+  });
+
+  const commits = data?.commits?.slice(0, 3) ?? [];
+  const todayCount = data?.todayCommitCount ?? 0;
+  const branches = data?.activeBranches ?? 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -22,7 +57,9 @@ export function GitHubCard() {
           </div>
           <div>
             <h3 className="font-display font-semibold text-foreground">GitHub</h3>
-            <p className="text-xs text-muted-foreground">Recent activity</p>
+            <p className="text-xs text-muted-foreground">
+              {isLoading ? "Loading..." : isError ? "Connection error" : "Recent activity"}
+            </p>
           </div>
         </div>
         <button className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-muted">
@@ -33,35 +70,49 @@ export function GitHubCard() {
       <div className="mb-4 flex items-center gap-4">
         <div className="flex items-center gap-2">
           <GitCommit className="h-4 w-4 text-primary" />
-          <span className="text-2xl font-display font-bold text-foreground">12</span>
-          <span className="text-xs text-muted-foreground">commits today</span>
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          ) : (
+            <>
+              <span className="text-2xl font-display font-bold text-foreground">{todayCount}</span>
+              <span className="text-xs text-muted-foreground">commits today</span>
+            </>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <GitBranch className="h-4 w-4 text-secondary" />
-          <span className="text-sm text-muted-foreground">3 active branches</span>
+          <span className="text-sm text-muted-foreground">{branches} active branches</span>
         </div>
       </div>
 
       <div className="space-y-3">
-        {mockCommits.map((commit, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 + index * 0.1 }}
-            className="flex items-start gap-3 rounded-lg bg-muted/30 p-3"
-          >
-            <div className="mt-0.5 h-2 w-2 rounded-full bg-primary" />
-            <div className="flex-1 min-w-0">
-              <p className="truncate text-sm font-medium text-foreground">
-                {commit.message}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {commit.repo} • {commit.time}
-              </p>
-            </div>
-          </motion.div>
-        ))}
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-16 animate-pulse rounded-lg bg-muted/30" />
+          ))
+        ) : commits.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4 text-center">No recent commits</p>
+        ) : (
+          commits.map((commit, index) => (
+            <motion.div
+              key={commit.sha ?? index}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 + index * 0.1 }}
+              className="flex items-start gap-3 rounded-lg bg-muted/30 p-3"
+            >
+              <div className="mt-0.5 h-2 w-2 rounded-full bg-primary" />
+              <div className="flex-1 min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">
+                  {commit.message}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {commit.repo} • {formatTime(commit.time)}
+                </p>
+              </div>
+            </motion.div>
+          ))
+        )}
       </div>
     </motion.div>
   );
