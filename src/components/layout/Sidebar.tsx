@@ -12,6 +12,7 @@ import {
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/" },
   { icon: Sparkles, label: "Daily Brief", path: "/brief" },
+  { icon: Brain, label: "AI Intelligence", path: "/intelligence" },
   { icon: Search, label: "Search", path: "/search" },
   { icon: LineChart, label: "Insights", path: "/insights" },
   { icon: Settings, label: "Settings", path: "/settings" },
