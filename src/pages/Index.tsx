@@ -5,6 +5,8 @@ import { RepoManagerCard } from "@/components/cards/RepoManagerCard";
 import { SpotifyCard } from "@/components/cards/SpotifyCard";
 import { CalendarCard } from "@/components/cards/CalendarCard";
 import { DailyBriefCard } from "@/components/cards/DailyBriefCard";
+import { FocusCard } from "@/components/cards/FocusCard";
+import { SyncStatusCard } from "@/components/cards/SyncStatusCard";
 import { Search, Command, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -44,7 +46,6 @@ const Index = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Search Bar */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -78,14 +79,19 @@ const Index = () => {
             <RepoManagerCard />
           </div>
           <div className="grid gap-6 md:grid-cols-2">
-            <SpotifyCard />
+            <FocusCard />
             <CalendarCard />
+          </div>
+          <div className="grid gap-6 md:grid-cols-2">
+            <SpotifyCard />
+            <DailyBriefCard />
           </div>
         </div>
 
         {/* Right Column */}
-        <div className="lg:col-span-1">
+        <div className="space-y-6 lg:col-span-1">
           <DailyBriefCard />
+          <SyncStatusCard />
         </div>
       </div>
 

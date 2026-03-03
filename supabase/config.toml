@@ -2,3 +2,12 @@ project_id = "jdieilyakhovncenwmsa"
 
 [functions.github-activity]
 verify_jwt = false
+
+[functions.github-account-manage]
+verify_jwt = false
+
+[functions.github-sync]
+verify_jwt = false
+
+[functions.generate-insights]
+verify_jwt = false

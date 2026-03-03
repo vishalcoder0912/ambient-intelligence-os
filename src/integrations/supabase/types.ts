@@ -44,6 +44,33 @@ export type Database = {
         }
         Relationships: []
       }
+      activity_vectors: {
+        Row: {
+          id: string
+          metadata: Json | null
+          recorded_at: string
+          source: string
+          user_id: string
+          weight: number
+        }
+        Insert: {
+          id?: string
+          metadata?: Json | null
+          recorded_at?: string
+          source: string
+          user_id: string
+          weight?: number
+        }
+        Update: {
+          id?: string
+          metadata?: Json | null
+          recorded_at?: string
+          source?: string
+          user_id?: string
+          weight?: number
+        }
+        Relationships: []
+      }
       ai_insights: {
         Row: {
           content: string
@@ -79,6 +106,163 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      focus_sessions: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          ended_at: string | null
+          id: string
+          label: string | null
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number
+          ended_at?: string | null
+          id?: string
+          label?: string | null
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          ended_at?: string | null
+          id?: string
+          label?: string | null
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      github_accounts: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          encrypted_token: string
+          id: string
+          is_default: boolean
+          last_sync_at: string | null
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          encrypted_token: string
+          id?: string
+          is_default?: boolean
+          last_sync_at?: string | null
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          encrypted_token?: string
+          id?: string
+          is_default?: boolean
+          last_sync_at?: string | null
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      github_sync_logs: {
+        Row: {
+          commits_synced: number | null
+          duration_ms: number | null
+          error_message: string | null
+          github_account_id: string
+          id: string
+          status: string
+          synced_at: string
+          user_id: string
+        }
+        Insert: {
+          commits_synced?: number | null
+          duration_ms?: number | null
+          error_message?: string | null
+          github_account_id: string
+          id?: string
+          status?: string
+          synced_at?: string
+          user_id: string
+        }
+        Update: {
+          commits_synced?: number | null
+          duration_ms?: number | null
+          error_message?: string | null
+          github_account_id?: string
+          id?: string
+          status?: string
+          synced_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "github_sync_logs_github_account_id_fkey"
+            columns: ["github_account_id"]
+            isOneToOne: false
+            referencedRelation: "github_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      productivity_metrics: {
+        Row: {
+          calculated_at: string
+          commit_count: number
+          created_at: string
+          daily_score: number
+          focus_minutes: number
+          github_account_id: string | null
+          id: string
+          metadata: Json | null
+          streak: number
+          user_id: string
+          weekly_score: number
+        }
+        Insert: {
+          calculated_at?: string
+          commit_count?: number
+          created_at?: string
+          daily_score?: number
+          focus_minutes?: number
+          github_account_id?: string | null
+          id?: string
+          metadata?: Json | null
+          streak?: number
+          user_id: string
+          weekly_score?: number
+        }
+        Update: {
+          calculated_at?: string
+          commit_count?: number
+          created_at?: string
+          daily_score?: number
+          focus_minutes?: number
+          github_account_id?: string | null
+          id?: string
+          metadata?: Json | null
+          streak?: number
+          user_id?: string
+          weekly_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "productivity_metrics_github_account_id_fkey"
+            columns: ["github_account_id"]
+            isOneToOne: false
+            referencedRelation: "github_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -119,6 +303,7 @@ export type Database = {
           commit_sha: string
           committed_at: string
           created_at: string
+          github_account_id: string | null
           id: string
           message: string
           tracked_repo_id: string
@@ -129,6 +314,7 @@ export type Database = {
           commit_sha: string
           committed_at: string
           created_at?: string
+          github_account_id?: string | null
           id?: string
           message: string
           tracked_repo_id: string
@@ -139,12 +325,20 @@ export type Database = {
           commit_sha?: string
           committed_at?: string
           created_at?: string
+          github_account_id?: string | null
           id?: string
           message?: string
           tracked_repo_id?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "repo_commits_github_account_id_fkey"
+            columns: ["github_account_id"]
+            isOneToOne: false
+            referencedRelation: "github_accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "repo_commits_tracked_repo_id_fkey"
             columns: ["tracked_repo_id"]
@@ -159,6 +353,7 @@ export type Database = {
           active_branches: number
           activity_score: number
           created_at: string
+          github_account_id: string | null
           id: string
           last_commit_at: string | null
           open_prs: number
@@ -174,6 +369,7 @@ export type Database = {
           active_branches?: number
           activity_score?: number
           created_at?: string
+          github_account_id?: string | null
           id?: string
           last_commit_at?: string | null
           open_prs?: number
@@ -189,6 +385,7 @@ export type Database = {
           active_branches?: number
           activity_score?: number
           created_at?: string
+          github_account_id?: string | null
           id?: string
           last_commit_at?: string | null
           open_prs?: number
@@ -202,6 +399,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "repo_stats_github_account_id_fkey"
+            columns: ["github_account_id"]
+            isOneToOne: false
+            referencedRelation: "github_accounts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "repo_stats_tracked_repo_id_fkey"
             columns: ["tracked_repo_id"]
             isOneToOne: true
@@ -210,11 +414,45 @@ export type Database = {
           },
         ]
       }
+      security_events: {
+        Row: {
+          created_at: string
+          details: Json | null
+          entity_id: string | null
+          entity_type: string | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          entity_id?: string | null
+          entity_type?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       tracked_repos: {
         Row: {
           created_at: string
           deleted_at: string | null
           description: string | null
+          github_account_id: string | null
           id: string
           repo_name: string
           repo_owner: string
@@ -225,6 +463,7 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           description?: string | null
+          github_account_id?: string | null
           id?: string
           repo_name: string
           repo_owner: string
@@ -235,13 +474,22 @@ export type Database = {
           created_at?: string
           deleted_at?: string | null
           description?: string | null
+          github_account_id?: string | null
           id?: string
           repo_name?: string
           repo_owner?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tracked_repos_github_account_id_fkey"
+            columns: ["github_account_id"]
+            isOneToOne: false
+            referencedRelation: "github_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
