@@ -14,9 +14,206 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_insights: {
+        Row: {
+          content: string
+          created_at: string
+          generated_at: string
+          id: string
+          insight_type: string
+          intelligence_score: number | null
+          metadata: Json | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          generated_at?: string
+          id?: string
+          insight_type: string
+          intelligence_score?: number | null
+          metadata?: Json | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          generated_at?: string
+          id?: string
+          insight_type?: string
+          intelligence_score?: number | null
+          metadata?: Json | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          deleted_at: string | null
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      repo_commits: {
+        Row: {
+          author: string | null
+          commit_sha: string
+          committed_at: string
+          created_at: string
+          id: string
+          message: string
+          tracked_repo_id: string
+          user_id: string
+        }
+        Insert: {
+          author?: string | null
+          commit_sha: string
+          committed_at: string
+          created_at?: string
+          id?: string
+          message: string
+          tracked_repo_id: string
+          user_id: string
+        }
+        Update: {
+          author?: string | null
+          commit_sha?: string
+          committed_at?: string
+          created_at?: string
+          id?: string
+          message?: string
+          tracked_repo_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repo_commits_tracked_repo_id_fkey"
+            columns: ["tracked_repo_id"]
+            isOneToOne: false
+            referencedRelation: "tracked_repos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repo_stats: {
+        Row: {
+          active_branches: number
+          activity_score: number
+          created_at: string
+          id: string
+          last_commit_at: string | null
+          open_prs: number
+          stars: number
+          synced_at: string
+          total_commits: number
+          tracked_repo_id: string
+          updated_at: string
+          user_id: string
+          weekly_streak: number
+        }
+        Insert: {
+          active_branches?: number
+          activity_score?: number
+          created_at?: string
+          id?: string
+          last_commit_at?: string | null
+          open_prs?: number
+          stars?: number
+          synced_at?: string
+          total_commits?: number
+          tracked_repo_id: string
+          updated_at?: string
+          user_id: string
+          weekly_streak?: number
+        }
+        Update: {
+          active_branches?: number
+          activity_score?: number
+          created_at?: string
+          id?: string
+          last_commit_at?: string | null
+          open_prs?: number
+          stars?: number
+          synced_at?: string
+          total_commits?: number
+          tracked_repo_id?: string
+          updated_at?: string
+          user_id?: string
+          weekly_streak?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repo_stats_tracked_repo_id_fkey"
+            columns: ["tracked_repo_id"]
+            isOneToOne: true
+            referencedRelation: "tracked_repos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tracked_repos: {
         Row: {
           created_at: string
+          deleted_at: string | null
           description: string | null
           id: string
           repo_name: string
@@ -26,6 +223,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           id?: string
           repo_name: string
@@ -35,6 +233,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           id?: string
           repo_name?: string
@@ -44,15 +243,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -179,6 +402,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
